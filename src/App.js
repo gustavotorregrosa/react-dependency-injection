@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { Route, Switch, withRouter, Redirect } from 'react-router'
+import PageLogin from './pages/login'
+import Index from './pages/index'
+import Admin from './pages/admin'
+import UserContext from './context/UserContext'
+import HttpContext from './context/HttpContext'
+import UserService from './services/user'
+import myHttpService from './services/http'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+let userService = new UserService
+let httpService = new myHttpService(userService) 
+
+class App extends React.Component{
+
+  componentDidMount = () => {
+    document.addEventListener('rerender-all', () => this.forceUpdate())
+  }
+
+  routes = (
+    <HttpContext.Provider value={httpService}>
+      <UserContext.Provider value={userService}>
+        <Switch>
+          <Route path="/admin" exact component={Admin}/>
+          <Route path="/login" exact component={PageLogin}/>
+          <Route path="/*" component={Index}/>
+        </Switch>
+      </UserContext.Provider>
+    </HttpContext.Provider>
+  )
+
+
+  render(){
+    return this.routes
+  }
+
 }
 
-export default App;
+
+export default withRouter(App);
